@@ -1,4 +1,4 @@
-versão 1.0 do ScrollBar
+versão 1.0 do ScrollBar Vertical
 
 Aceita teclas Up, Down, PgUp, PgDown, Home, End, cliques do mouse. Também redimensiona sem alterar a visualização asset.
 
@@ -6,4 +6,5 @@ Exemplo de uso:
 Para ver como usar, abrir o arquivo fla e o Main.as
 
 TODO:
-Incluir suporte para mousewheel.
+- Incluir suporte para mousewheel
+- Permitir fazer scroll horizontal
