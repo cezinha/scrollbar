@@ -7,80 +7,177 @@ package br.com.cezinha.ui {
 	import flash.geom.Rectangle;
 	import flash.ui.Keyboard;
 
-	/*
+	/**
+	 * Esta classe controla o ScrollBar Vertical. Deve ser associado a um elemento no arquivo FLA que
+	 * contenha os assets no Stage nomeados como btnUp, btnDw, btnBar e bg.
+	 *
 	 * @author Celina Uemura (cezinha@cezinha.com.br)
-	*/
+	 */
 	public class ScrollBar extends Sprite{
-		// PUBLIC PROPERTIES
+		/** 
+		 * PUBLIC PROPERTIES 
+		 */
+
 		// Assets no Stage
+
+		/** botao para cima do scroll */
 		public var btnUp : SimpleButton;
+
+		/** botao para baixo do scroll */
 		public var btnDw : SimpleButton;
+
+		/** botao da barra do scroll */
 		public var btnBar : ScrollBarButton;
+
+		/** fundo da barra */
 		public var bg : Sprite;
 		
-		// PRIVATE PROPERTIES
-		private var _contentY : Number; // posição y do content
-		private var _contentScrollY : Number; // posição do content de acordo com a posição do scroll
-		private var _contentScrollH : Number; // altura da área visível do content
-		private var _contentMaxH : Number; // altura máxima do content
+		/** 
+		 * PRIVATE PROPERTIES 
+		 */
+
+		/** posição y do conteudo que recebe o scroll */
+		private var _contentY : Number; 
+
+		/** posição do conteudo de acordo com a posição do scroll */
+		private var _contentScrollY : Number; 
+
+		/** altura da área visível do conteudo */
+		private var _contentScrollH : Number; 
+
+		/**  altura máxima do conteudo */
+		private var _contentMaxH : Number; 
 		
+		/**  
+		 * altura da barra: sempre proporcional ao espaço visível do conteúdo
+		 * proporção: _bgH / _barH = _contentH / altura_visivel
+		 * altura_visivel pode ser a altura da máscara que fica sobre o conteúdo.
+		 */
 		private var _barH : Number;
+
+		/** altura do fundo do scroll */
 		private var _bgH : Number;
 		
+		/** ativa ou desativa o scroll */
 		private var _enabled : Boolean;
+
+		/** ativo quando a barra é movimentada */
 		private var _isDragging : Boolean;
+
+		/** ativo quando o botão do mouse está clicado */
 		private var _mouseIsDown : Boolean;
 		
-		// CONSTRUCTOR
+		/** 
+		 * CONSTRUCTOR
+		 * @see #onAddedToStage()
+		 */
 		public function ScrollBar() {
 			_enabled = false;
-			
+
+			// chama o evento ADDED_TO_STAGE para quando os elementos aparecerem			
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
 		
+		/** 
+		 * PUBLIC FUNCTIONS
+		 */
+
+		/** 
+		 * Define os parâmetros para inicializar o scroll
+		 * @param y posição y do conteúdo que receberá o scroll no stage
+		 * @param h altura visível do conteúdo (mascara)
+		 * @param maxH altura total do conteúdo
+		 * @return void
+		 * 
+		 * @see #addListeners()
+		 * @see #startScroll()
+		 */
+		public function setContentSize(y:Number, h:Number, maxH:Number) : void {
+			// inicializa os parametros na classe
+			_contentY = y;
+			_contentScrollH = h;
+			_contentMaxH = maxH;
+
+			// adiciona listeners
+			addListeners();
+			
+			// verifica se precisa do scroll
+			if (_contentScrollH < _contentMaxH) {
+				startScroll();
+			}
+		}
+
+		/** 
+		 * Remove os listeners, para caso precise remover o objeto do stage
+		 * @return void
+		 */
+		public function destroy() : void {
+			removeListeners();
+		}
+		
+		/** 
+		 * EVENT LISTENERS
+		 */
+
+		/** 
+		 * Inicializa depois que os elementos estão no stage
+		 * @param event Evento
+		 * @return void
+		 * 
+		 * @see #setContentSize()
+		 */
 		private function onAddedToStage(event : Event) : void {
+			// remove o listener 
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+			// deixa todos os elementos do scroll invisíveis. 
+			// só serão exibidos depois que o scroll ter seus parametros inicializados
 			btnUp.visible = false;
 			btnDw.visible = false;
 			btnBar.visible = false;
 			bg.visible = false;
 			
+			// define os valores iniciais
 			_isDragging = false;
 			_mouseIsDown = false;
 		}
 
-		// PUBLIC FUNCTIONS
-		public function setContentSize(y:Number, h:Number, maxH:Number) : void {
-			_contentY = y;
-			_contentScrollH = h;
-			_contentMaxH = maxH;
-			addListeners();
-			trace(_contentScrollH < _contentMaxH);
-			if (_contentScrollH < _contentMaxH) {
-				startScroll();
-			}
-		}
-		public function destroy() : void {
-			removeListeners();
-		}
-		
-		// EVENT LISTENERS
+		/** 
+		 * Chamado quando o usuário aperta o botão do mouse em cima da barra
+		 * @param event Evento
+		 * @return void
+		 */
 		private function mouseDown(event : MouseEvent) : void {
+			// define a área que pode mover a barra 
 			var rect : Rectangle = new Rectangle(btnBar.x, bg.y, 0, _bgH - _barH);
+			// começa o drag da barra
 			btnBar.startDrag(false, rect);
 			
+			// inicializa os eventos para serem capturados depois que a barra começa a mover
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 			stage.addEventListener(Event.ENTER_FRAME, updatePosition);
 			
+			// coloca o botao da barra no modo over
 			btnBar.onOver();
+
+			// ativa os controles para mouseIsDown e isDragging
 			_mouseIsDown = true;
 			_isDragging = true;
 		}
 		
+		/** 
+		 * Chamado no enterframe quando o usuário aperta o botão do mouse em cima da barra
+		 * @param event Evento
+		 * @return void
+		 * 
+		 * @see #moveScroll()
+		 */
 		private function updatePosition(event : Event = null) : void {
+			// faz a proporção e grava como porcentagem
 			var percent:Number = (btnBar.y - bg.y) / (_bgH - _barH);
-			
+
+			// move o scroll e dispara evento 
 			moveScroll(percent);
 		}
 		
