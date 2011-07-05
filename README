@@ -5,6 +5,10 @@ Aceita teclas Up, Down, PgUp, PgDown, Home, End, cliques do mouse. Também redim
 Exemplo de uso:
 Para ver como usar, abrir o arquivo fla e o Main.as
 
+DEPENDENCIES
+TweenMax: http://www.greensock.com/tweenmax/
+BulkLoader: http://code.google.com/p/bulk-loader/
+
 TODO:
 - Incluir suporte para mousewheel
 - Permitir fazer scroll horizontal
