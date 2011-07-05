@@ -12,6 +12,21 @@ package br.com.cezinha.box {
 
 	/**
 	 * @author Celina Uemura (cezinha@cezinha.com.br)
+	 * 
+	 * @example
+	 * import br.com.stimuli.loading.BulkLoader;
+	 * import br.com.cezinha.box.*;
+	 * 
+	 * var loader : BulkLoader = new BulkLoader("main-site");
+	 * var image : Image = new Image();
+	 * image.addEventListener(ImageEvent.COMPLETE, onImageLoaded)
+	 * image.load("imagem.jpg");
+	 * addChild(image);
+	 * 
+	 * function onImageLoaded(e:ImageEvent) {
+	 *     image.show();
+	 * }
+	 * 
 	 */
 	public class Image extends Sprite implements IBox {
 		//  PUBLIC PROPERTIES -------------------------------------------------------------------------------------	
